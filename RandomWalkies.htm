@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<!-- saved from url=(0021)http://www.glidr.net/ -->
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Glidr Labs</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="http://www.glidr.net/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Add custom CSS here -->
+    <link href="http://www.glidr.net/css/stylish-portfolio-nobackground.css" rel="stylesheet">
+    <link href="http://www.glidr.net/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <style>
+    canvas{
+      position:absolute;
+      left:0;
+      top:0;
+      z-index:-1;
+    }
+  </style>
+  <style>[touch-action="none"]{ -ms-touch-action: none; touch-action: none; }[touch-action="pan-x"]{ -ms-touch-action: pan-x; touch-action: pan-x; }[touch-action="pan-y"]{ -ms-touch-action: pan-y; touch-action: pan-y; }[touch-action="scroll"],[touch-action="pan-x pan-y"],[touch-action="pan-y pan-x"]{ -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; }</style>
+  <style id="style-1-cropbar-clipper">/* Copyright 2014 Evernote Corporation. All rights reserved. */
+.en-markup-crop-options {
+    top: 18px !important;
+    left: 50% !important;
+    margin-left: -90px !important;
+    width: 180px !important;
+    border: 2px rgba(255,255,255,.38) solid !important;
+    border-radius: 4px !important;
+}
+
+.en-markup-crop-options div div:first-of-type {
+    margin-left: 0px !important;
+}
+  </style>
+  <script type="text/javascript" src="canvasjs.min.js"></script>
+
+
+  
+
+
+</head>
+
+
+ 
+  <body>
+
+  <div id="chartContainer" style="height: 500px; width: 50%;"></div>
+    <canvas id="myCanvas" width="1366" height="300" style="border:1px solid #c3c3c3;">
+      Your browser does not support the canvas element.
+    </canvas>
+
+    <script type="text/javascript">
+var dps = []; // dataPoints
+    var chart = new CanvasJS.Chart("chartContainer",{
+      title :{
+        text: "Live Random Data"
+      },      
+      data: [{
+        type: "line",
+        dataPoints: dps 
+      }]
+    });
+
+    // 
+    window.onload = function () {
+
+    
+
+
+
+    var xVal = 0;
+    var yVal = 100; 
+    var updateInterval = 20;
+    var dataLength = 500; // number of dataPoints visible at any point
+
+    var updateChart = function (count) {
+      // count = count || 1;
+      // // count is number of times loop runs to generate random dataPoints.
+      
+      // for (var j = 0; j < count; j++) { 
+      //   yVal = yVal +  Math.round(5 + Math.random() *(-5-5));
+      //   dps.push({
+      //     x: xVal,
+      //     y: yVal
+      //   });
+      //   xVal++;
+      // };
+      // if (dps.length > dataLength)
+      // {
+      //   dps.shift();        
+      // }
+      
+      //chart.render();   
+
+    };
+
+    // generates first set of dataPoints
+    updateChart(dataLength); 
+
+    // update chart after specified time. 
+    setInterval(function(){updateChart()}, updateInterval); 
+
+  }
+
+        var gridsize = 16
+        var interval = 0.1
+        // var width =  Math.floor(window.innerWidth/gridsize);
+        // var height =  Math.floor(window.innerHeight/gridsize);
+        time = 1000
+        hits = 1
+        ratio = 0
+        var width =  24;
+        var height =  24;
+        var posx = randint(width)   // Postion x, y
+        var posy = randint(height)
+        var tarx = randint(width)   // Target position x, y
+        var tary = randint(height)
+        
+        function randint (max){
+          return Math.floor(Math.random()*max)
+        }
+
+        function on_resize(){
+          oldlength = width*height
+          width =  Math.floor(window.innerWidth/gridsize);
+          height =  Math.floor(window.innerHeight/gridsize);
+          c.width = window.innerWidth
+          c.height = window.innerHeight
+        }
+        //window.onresize =on_resize;
+
+        function walk(){
+          //randomwalk
+
+          var dir = Math.floor(Math.random()*2) == 0;
+          var delta = Math.floor(Math.random()*2)*2-1;
+
+          if (dir) {posx += delta } 
+            else{posy += delta};
+
+          // Keep pos in bounds and wrap (improve this!)
+          if (posx < 0) {posx+=width-1};
+          if (posy < 0) {posy+=height-1};
+          if (posx >= width) {posx=0};
+          if (posy >= height) {posy=0};
+        }
+        
+
+        function drawsquare(x, y, size, style) {
+          context.strokeStyle = style;
+          context.fillStyle = style;
+          context.fillRect(x*size, y*size, size-1, size-1);
+        }
+
+        function renderwalk(){
+          drawsquare(posx,posy,gridsize, "LightGray");
+          time++
+          if (posx == tarx && posy == tary) {       // target hit
+            hits++
+            tarx = randint(width)                 // new target position x, y
+            tary = randint(height)
+            context.clearRect(0,0,width*gridsize,height*gridsize)
+            drawsquare(tarx,tary,gridsize,"LightRed")
+          };
+          ratio = time / hits   // time to hit
+          dps.push({
+            x: time,
+            y: ratio
+          });
+
+          if (time > 3000) {dps.shift()};
+
+          if (time % 10 == 0){
+            chart.render()
+          }
+        }
+      
+        var c=document.getElementById("myCanvas");
+          c.width = window.innerWidth
+          c.height = window.innerHeight
+        var context=c.getContext("2d");        
+        // var c=document.getElementById("myCanvas");
+        drawsquare(tarx,tary,gridsize,"Red")
+        var intervalID = setInterval(function(){walk();renderwalk();}, interval);
+        
+
+    </script>
+    
+    <!-- Full Page Image Header Area -->
+    <div id="top" class="header">
+      <div class="vert-text">
+        <h1>Glidr Labs</h1>
+        <h3>Building Tomorrow’s Internet</h3>
+        <!-- <a href="http://www.glidr.net/#about" class="btn btn-default btn-lg">Work In Progress</a> -->
+      </div>
+    </div>
+    <!-- /Full Page Image Header Area -->
+
+
+    <!-- Bootstrap core JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./glidr labs_files/jquery.js"></script>
+    <script src="./glidr labs_files/bootstrap.js"></script>
+
+    <!-- Custom JavaScript for the Side Menu and Smooth Scrolling - Put in a custom JavaScript file to clean this up -->
+    <script>
+        $("#menu-close").click(function(e) {
+            e.preventDefault();
+            $("#sidebar-wrapper").toggleClass("active");
+        });
+    </script>
+    <script>
+        $("#menu-toggle").click(function(e) {
+            e.preventDefault();
+            $("#sidebar-wrapper").toggleClass("active");
+        });
+    </script>
+    <script>
+      $(function() {
+        $('a[href*=#]:not([href=#])').click(function() {
+          if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') 
+            || location.hostname == this.hostname) {
+
+            var target = $(this.hash);
+            target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+            if (target.length) {
+              $('html,body').animate({
+                scrollTop: target.offset().top
+              }, 1000);
+              return false;
+            }
+          }
+        });
+      });
+    </script>
+
+  
+
+</body></html>
